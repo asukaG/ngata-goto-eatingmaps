@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+  <link rel="stylesheet" href="gotoeat.css">
+  <script src="gotoeat.geojson"></script>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+  <script>
+	function init() {
+		//ズームコントロールを非表示で地図を作成
+		var map = L.map('map', { zoomControl: false });
+		map.setView([37.948284, 139.142853], 10);
+		//スケールコントロールを最大幅200px、右下、m単位で地図に追加
+		L.control.scale({ maxWidth: 200, position: 'bottomright', imperial: false }).addTo(map);
+      	//ズームコントロールを左下で地図に追加
+		L.control.zoom({ position: 'bottomleft' }).addTo(map);
+		
+		//地理院地図の標準地図タイル
+		var gsi =L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', 
+			{attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"});
+		//地理院地図の淡色地図タイル
+		var gsipale = L.tileLayer('http://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
+			{attribution: "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>地理院タイル</a>"});
+		//オープンストリートマップのタイル
+		var osm = L.tileLayer('http://tile.openstreetmap.jp/{z}/{x}/{y}.png',
+			{  attribution: "<a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors" });
+		//baseMapsオブジェクトのプロパティに3つのタイルを設定
+
+		// Googleマップ
+		/*
+		google_map = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', 
+			{	attribution: "<a>©Google</a>"
+		});
+		*/
+		
+		/*
+		// Googleマップ(航空写真)
+		google_satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
+			{attribution: "<a>©Google</a>"
+		});
+		*/
+
+		var baseMaps = {
+			"地理院地図" : gsi,
+			"淡色地図" : gsipale,
+			"オープンストリートマップ"  : osm
+			//"Googleマップ"  : google_map,
+			//"Googleマップ(航空写真)"  : google_satellite
+      };
+      //layersコントロールにbaseMapsオブジェクトを設定して地図に追加
+      //コントロール内にプロパティ名が表示される
+      L.control.layers(baseMaps).addTo(map);
+	  osm.addTo(map);
+
+	  //var geoJson_sample = L.geoJson(pointdata).addTo(map);
+
+	  var geoJson_sample = L.geoJSON(pointdata,
+	  {
+		  onEachFeature: function (f, l) 
+		  {
+			  l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+			}
+		}).addTo(map);
+
+	  //店名
+	  //alert(pointdata['features'][2]['properties']['店名']);
+	}
+
+	</script>
+</head>
+
+<body onload="init()">
+    <div id="map" style="position:absolute;top:0;left:0;right:0;bottom:0;"></div>></div>
+</body>
+</html>
