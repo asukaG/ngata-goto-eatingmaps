@@ -30,26 +30,22 @@
 			{  attribution: "<a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors" });
 		//baseMapsオブジェクトのプロパティに3つのタイルを設定
 
-		// Googleマップ
-		/*
+		//Googleマップ
 		google_map = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', 
 			{	attribution: "<a>©Google</a>"
 		});
-		*/
 		
-		/*
 		// Googleマップ(航空写真)
 		google_satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
 			{attribution: "<a>©Google</a>"
 		});
-		*/
 
 		var baseMaps = {
 			"地理院地図" : gsi,
 			"淡色地図" : gsipale,
-			"オープンストリートマップ"  : osm
-			//"Googleマップ"  : google_map,
-			//"Googleマップ(航空写真)"  : google_satellite
+			"オープンストリートマップ"  : osm,
+			"Googleマップ"  : google_map,
+			"Googleマップ(航空写真)"  : google_satellite
       };
       //layersコントロールにbaseMapsオブジェクトを設定して地図に追加
       //コントロール内にプロパティ名が表示される
@@ -62,7 +58,7 @@
 	  {
 		  onEachFeature: function (f, l) 
 		  {
-			  l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+			  l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'+'<a href=https://www.google.com/maps/search/?api=1&query=' + f.properties.店名 + '>' + 'ここへいく' + '</a>');
 			}
 		}).addTo(map);
 
@@ -74,11 +70,11 @@
 </head>
 
 <body onload="init()">
-	<br><br><br><br><br>
-	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<br>
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 	<footer class="footer">
 		<div class="content has-text-centered">
-			<p>10月7日現在の新潟県Go To Eatマップ(約1000店舗)（新潟県非公式）について</p>
+			<p>10月7日現在の新潟県Go To Eatマップ（新潟県非公式）について</p>
 			<p>新潟県Go To Eatを個人的に応援するために、個人が作成したマップです</p>
 			<p><a href="https://niigata-gte.com/">新潟県Go To Eatについて</a></p>
 			<p><a href="https://niigata-gte.com/pdf/ticket-counter-list.pdf">GoToEatキャンペーン　販売窓口一覧</a></p>
