@@ -58,7 +58,7 @@
 	  {
 		  onEachFeature: function (f, l) 
 		  {
-			  l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'+'<a href=https://www.google.com/maps/search/?api=1&query=' + f.properties.店名 + '>' + 'ここへいく' + '</a>');
+			  l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'+'<a href=https://www.google.com/maps/search/?api=1&query=' + '新潟県' + f.properties.住所 + '+' + f.properties.店名 + '>' + 'ここへいく' + '</a>');
 			}
 		}).addTo(map);
 
@@ -82,5 +82,9 @@
 	</footer>
 	<div id="map" style="position:absolute;top:0;left:0;right:0;bottom:0;"></div>
 
+<!--
+Copyright (c) 2020 asukaG
+Released under the MIT license
+-->
 </body>
 </html>
