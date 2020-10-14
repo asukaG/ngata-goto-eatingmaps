@@ -6,17 +6,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>新潟県(非公式)Go To Eatマップ</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
   <link rel="stylesheet" href="gotoeat.css">
   <script src="gotoeat.geojson"></script>
-  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
-  <script>
-	function init() {
+
+  <link rel="stylesheet" href="Currently/L.Icon.Pulse.css" >
+  <script src="Currently/L.Icon.Pulse.js" ></script>
+</head>
+<body>
+	<div id="map"></div>
+	<br>	
+	<button id="btnCurLocation" onClick="setCurLocation()">現在地を表示</button>
+	<footer class="footer">
+		<div class="content has-text-centered">
+			<p>10月9日現在の新潟県Go To Eatマップ（新潟県非公式）について</p>
+			<p>新潟県Go To Eatを個人的に応援するために、個人が作成したマップです</p>
+			<p><a href="https://niigata-gte.com/">新潟県Go To Eatについて</a></p>
+			<p><a href="https://niigata-gte.com/pdf/ticket-counter-list.pdf">GoToEatキャンペーン　販売窓口一覧</a></p>
+		</div>
+	</footer>
+
+	<div id="map" style="position:absolute;top:0;left:0;right:0;bottom:0;"></div>
+	<script>
 		//ズームコントロールを非表示で地図を作成
 		var map = L.map('map', { zoomControl: false });
 		map.setView([37.948284, 139.142853], 10);
 		//スケールコントロールを最大幅200px、右下、m単位で地図に追加
 		L.control.scale({ maxWidth: 200, position: 'bottomright', imperial: false }).addTo(map);
-      	//ズームコントロールを左下で地図に追加
+		//ズームコントロールを左下で地図に追加
 		L.control.zoom({ position: 'bottomleft' }).addTo(map);
 		
 		//地理院地図の標準地図タイル
@@ -29,7 +47,7 @@
 		var osm = L.tileLayer('http://tile.openstreetmap.jp/{z}/{x}/{y}.png',
 			{  attribution: "<a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors" });
 		//baseMapsオブジェクトのプロパティに3つのタイルを設定
-
+	
 		//Googleマップ
 		google_map = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', 
 			{	attribution: "<a>©Google</a>"
@@ -39,52 +57,58 @@
 		google_satellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', 
 			{attribution: "<a>©Google</a>"
 		});
-
+	
 		var baseMaps = {
 			"地理院地図" : gsi,
 			"淡色地図" : gsipale,
 			"オープンストリートマップ"  : osm,
 			"Googleマップ"  : google_map,
 			"Googleマップ(航空写真)"  : google_satellite
-      };
-      //layersコントロールにbaseMapsオブジェクトを設定して地図に追加
-      //コントロール内にプロパティ名が表示される
-      L.control.layers(baseMaps).addTo(map);
-	  osm.addTo(map);
-
-	  //var geoJson_sample = L.geoJson(pointdata).addTo(map);
-
-	  var geoJson_sample = L.geoJSON(pointdata,
-	  {
-		  onEachFeature: function (f, l) 
-		  {
-			  l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'+'<a href=https://www.google.com/maps/search/?api=1&query=' + '新潟県' + f.properties.住所 + '+' + f.properties.店名 + '>' + 'ここへいく' + '</a>');
+		};
+		//layersコントロールにbaseMapsオブジェクトを設定して地図に追加
+		//コントロール内にプロパティ名が表示される
+		L.control.layers(baseMaps).addTo(map);
+		osm.addTo(map);
+	
+		//var geoJson_sample = L.geoJson(pointdata).addTo(map);
+	
+		var geoJson_sample = L.geoJSON(pointdata,
+		{
+			onEachFeature: function (f, l) 
+			{
+				l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'+'<a href=https://www.google.com/maps/search/?api=1&query=' + '新潟県' + f.properties.住所 + '+' + f.properties.店名 + '>' + 'ここへいく' + '</a>');
 			}
 		}).addTo(map);
-
-	  //店名
-	  //alert(pointdata['features'][2]['properties']['店名']);
-	}
-
+	
+		//店名
+		//alert(pointdata['features'][2]['properties']['店名']);
+	
+		function setCurLocation(){
+			if (navigator.geolocation == false){
+			  alert('現在地を取得できませんでした。');
+			  return;
+			}
+	 
+			function success(e) {
+			  var lat  = e.coords.latitude;
+			  var lng = e.coords.longitude;
+			  map.setView([lat, lng], 15);
+	 
+			  var pulsingIcon = L.icon.pulse({iconSize:[20,20],color:'#1199fb'});
+			  L.marker([lat, lng],{icon: pulsingIcon}).addTo(map);
+	 
+			};
+	 
+			function error() {
+			  alert('現在地を取得できませんでした。');
+			};
+	 
+			navigator.geolocation.getCurrentPosition(success, error);
+		  }
 	</script>
-</head>
-
-<body onload="init()">
-	<br>
-	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-	<footer class="footer">
-		<div class="content has-text-centered">
-			<p>10月7日現在の新潟県Go To Eatマップ（新潟県非公式）について</p>
-			<p>新潟県Go To Eatを個人的に応援するために、個人が作成したマップです</p>
-			<p><a href="https://niigata-gte.com/">新潟県Go To Eatについて</a></p>
-			<p><a href="https://niigata-gte.com/pdf/ticket-counter-list.pdf">GoToEatキャンペーン　販売窓口一覧</a></p>
-		</div>
-	</footer>
-	<div id="map" style="position:absolute;top:0;left:0;right:0;bottom:0;"></div>
-
-<!--
-Copyright (c) 2020 asukaG
-Released under the MIT license
--->
+	<!--
+	Copyright (c) 2020 asukaG
+	Released under the MIT license
+	-->
 </body>
 </html>
