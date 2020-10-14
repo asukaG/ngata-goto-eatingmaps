@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="gotoeat.css">
   <script src="gotoeat.geojson"></script>
 
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/L.Control.Locate.min.css" />
+  <script src="js/L.Control.Locate.min.js"></script>
+
   <link rel="stylesheet" href="Currently/L.Icon.Pulse.css" >
   <script src="Currently/L.Icon.Pulse.js" ></script>
 </head>
@@ -44,7 +48,7 @@
 		var gsipale = L.tileLayer('http://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
 			{attribution: "<a href='http://portal.cyberjapan.jp/help/termsofuse.html' target='_blank'>地理院タイル</a>"});
 		//オープンストリートマップのタイル
-		var osm = L.tileLayer('http://tile.openstreetmap.jp/{z}/{x}/{y}.png',
+		var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			{  attribution: "<a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors" });
 		//baseMapsオブジェクトのプロパティに3つのタイルを設定
 	
@@ -82,7 +86,20 @@
 	
 		//店名
 		//alert(pointdata['features'][2]['properties']['店名']);
-	
+		// Locate
+        var option = {
+          position: 'topright',
+          strings: {
+              title: "現在地を表示",
+              popup: "いまここ"
+          },
+          locateOptions: {
+            maxZoom: 16
+          }
+        }
+		var lc = L.control.locate(option).addTo(map);
+		lc.start();
+
 		function setCurLocation(){
 			if (navigator.geolocation == false){
 			  alert('現在地を取得できませんでした。');
